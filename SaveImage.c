@@ -15,7 +15,7 @@ int saveImage(Image* img, const char* path)
 	byte fileHeader[14];
 	fileHeader[0] = 'B';
 	fileHeader[1] = 'M';
-	((dword*)(fileHeader + 2))[0] = 54 + 3 * (img->width + padding) * img->height; //File size in bytes
+	((dword*)(fileHeader + 2))[0] = 54 + sizeRow * img->height; //File size in bytes
 	((dword*)(fileHeader + 2))[2] = 54; //Offset to start of pixel data
 
 	fwrite(fileHeader, 1, 14, f);
@@ -39,7 +39,7 @@ int saveImage(Image* img, const char* path)
 	dword blank = 0;
 
 	//Writting pixel data
-	byte *bmpData = malloc(3 * img->width * img->height);
+	byte *bmpData = malloc(sizeRow * img->height);
 
 	for (int i = img->height - 1; i >= 0; i--)
 	{

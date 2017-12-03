@@ -7,6 +7,20 @@ enum state {
 	ReadingWidth, ReadingHeight, ReadingMaxval
 };
 
+int readNumber(unsigned int* number, byte b)
+{
+	*number *= 10;
+	if (b < '0' || b > '9')
+	{
+		return 1;
+	}
+	else
+	{
+		*number += b - '0';
+	}
+	return 0;
+}
+
 int loadImage(Image* img, const char* src)
 {
 	img->width = 0;
@@ -39,7 +53,7 @@ int loadImage(Image* img, const char* src)
 	{
 		if (comment)
 		{
-			if (isspace(b) && b != ' ')
+			if (b == '\n')
 			{
 				comment = 0;
 			}
@@ -61,28 +75,18 @@ int loadImage(Image* img, const char* src)
 				}
 				else if (readingState == ReadingWidth)
 				{
-					img->width *= 10;
-					if (b < '0' || b > '9')
+					if (readNumber(&img->width, b))
 					{
 						fclose(f);
 						return 1;
-					}
-					else
-					{
-						img->width += b - '0';
 					}
 				}
 				else if (readingState == ReadingHeight)
 				{
-					img->height *= 10;
-					if (b < '0' || b > '9')
+					if (readNumber(&img->height, b))
 					{
 						fclose(f);
 						return 1;
-					}
-					else
-					{
-						img->height += b - '0';
 					}
 				}
 			}
@@ -94,6 +98,12 @@ int loadImage(Image* img, const char* src)
 		fread(&b, 1, 1, f);
 	}
 	
+	if (feof(f))
+	{
+		fclose(f);
+		return 1;
+	}
+
 	//Read file content
 	int size = 3 * img->width * img->height;
 	img->data = malloc(size);

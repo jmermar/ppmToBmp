@@ -26,6 +26,7 @@ int main(int argc, char** argv)
 
 	if (saveImage(&image, argv[2]))
 	{
+		free(image.data);
 		printf("Cannot write or create file\n");
 		return 2;
 	}
