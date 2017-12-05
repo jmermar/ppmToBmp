@@ -41,19 +41,21 @@ int saveImage(Image* img, const char* path)
 	//Writting pixel data
 	byte *bmpData = malloc(sizeRow * img->height);
 
+	int e = 0;
 	for (int i = img->height - 1; i >= 0; i--)
 	{
 		for (int j = 0; j < img->width; j++)
 		{
 			//converting the img rgb pixel data to bgr
-			bmpData[i * sizeRow + 3 * j]		= img->data[i * 3 * img->width + 3 * j + 2];
-			bmpData[i * sizeRow + 3 * j + 1]	= img->data[i * 3 * img->width + 3 * j + 1];
-			bmpData[i * sizeRow + 3 * j + 2]	= img->data[i * 3 * img->width + 3 * j];
+			bmpData[e * sizeRow + 3 * j]		= img->data[i * 3 * img->width + 3 * j + 2];
+			bmpData[e * sizeRow + 3 * j + 1]	= img->data[i * 3 * img->width + 3 * j + 1];
+			bmpData[e * sizeRow + 3 * j + 2]	= img->data[i * 3 * img->width + 3 * j];
 		}
 		for (int j = 0; j < padding; j++)
 		{
 			bmpData[i * sizeRow + 3 * img->width + j] = 0;
 		}
+		e++;
 	}
 
 	fwrite(bmpData, 1, sizeRow * img->height, f);
