@@ -4,6 +4,30 @@
 #include <memory.h>
 #include "Image.h"
 
+#pragma pack(1)
+typedef struct {
+	byte type[2];
+	dword size;
+	word reserved1;
+	word reserved2;
+	dword offset;
+} FileHeader;
+
+#pragma pack(1)
+typedef struct {
+	dword size;
+	dword width;
+	dword height;
+	word planes; //Must be 1
+	word bpp; //Bits per pixel
+	dword compression;
+	dword sizeImage;
+	dword xppm; //x pixels per meter
+	dword yppm; //y pixels per meter
+	dword clru; //Colors used
+	dword clri; //Colors important
+} ImageHeader;
+
 int saveImage(Image* img, const char* path)
 {
 	int padding = (4 - (3 * img->width) % 4) % 4;
@@ -11,30 +35,29 @@ int saveImage(Image* img, const char* path)
 	FILE* f;
 	f = fopen(path, "wb");
 
-	//Writting the header
-	byte fileHeader[14];
-	fileHeader[0] = 'B';
-	fileHeader[1] = 'M';
-	((dword*)(fileHeader + 2))[0] = 54 + sizeRow * img->height; //File size in bytes
-	((dword*)(fileHeader + 2))[2] = 54; //Offset to start of pixel data
+	FileHeader fh;
+	fh.type[0] = 'B';
+	fh.type[1] = 'M';
+	fh.reserved1 = fh.reserved2 = 0;
+	fh.size = sizeof(FileHeader) + sizeof(ImageHeader) + sizeRow * img->height;
+	fh.offset = sizeof(FileHeader) + sizeof(ImageHeader);
 
-	fwrite(fileHeader, 1, 14, f);
+	fwrite(&fh, 1, sizeof(fh), f);
 
-	//Writting image header
-	byte imageHeader[40];
-	((dword*)imageHeader)[0] = 40; //Size of imageHeader
-	((dword*)imageHeader)[1] = img->width; //image width in pixels
-	((dword*)imageHeader)[2] = img->height; //image height in pixels
-	((word*)imageHeader)[6] = 1; //Must be 1
-	((word*)imageHeader)[7] = 24; //Bits per pixel
-	((dword*)imageHeader)[4] = 0; //Compresion type (0 for uncompressed)
-	((dword*)imageHeader)[5] = 0; //Image Size (0 for uncompressed)
-	((dword*)imageHeader)[6] = 0; //Bits per metter
-	((dword*)imageHeader)[7] = 0; //Bits per metter
-	((dword*)imageHeader)[8] = 0; //Color maps used
-	((dword*)imageHeader)[9] = 0; //Significant colors
+	ImageHeader ih;
+	ih.size = sizeof(ImageHeader);
+	ih.width = img->width;
+	ih.height = img->height;
+	ih.planes = 1;
+	ih.bpp = 24;
+	ih.compression = 0;
+	ih.sizeImage = 0;
+	ih.xppm = 0;
+	ih.yppm = 0;
+	ih.clru = 0;
+	ih.clri = 0;
 
-	fwrite(imageHeader, 1, 40, f);
+	fwrite(&ih, 1, sizeof(ih), f);
 
 	dword blank = 0;
 
