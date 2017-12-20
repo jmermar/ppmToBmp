@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <memory.h>
-#include "Image.h"
+#include "image.h"
 
 #pragma pack(1)
 typedef struct {
@@ -28,7 +28,7 @@ typedef struct {
 	dword clri; //Colors important
 } ImageHeader;
 
-int saveImage(Image* img, const char* path)
+int save_image(Image* img, const char* path)
 {
 	int padding = (4 - (3 * img->width) % 4) % 4;
 	int sizeRow = 3 * img->width + padding;

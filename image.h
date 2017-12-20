@@ -10,7 +10,7 @@ typedef struct {
 	byte* data;
 } Image;
 
-int loadImage(Image* img, const char* src);
-int saveImage(Image* img, const char* path);
+int load_image(Image* img, const char* src);
+int save_image(Image* img, const char* path);
 
 #endif

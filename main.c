@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include <stdlib.h>
+#include "image.h"
 
-#include "Image.h"
 int main(int argc, char** argv)
 {
 	if (argc < 3)
@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 	Image image;
 	image.data = 0;
 
-	int err = loadImage(&image, argv[1]);
+	int err = load_image(&image, argv[1]);
 	if (err < 0)
 	{
 		printf("Cannot read file\n");
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	if (saveImage(&image, argv[2]))
+	if (save_image(&image, argv[2]))
 	{
 		free(image.data);
 		printf("Cannot write or create file\n");

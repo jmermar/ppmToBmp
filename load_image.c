@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "Image.h"
+#include "image.h"
 
 enum state {
 	ReadingWidth, ReadingHeight, ReadingMaxval
 };
 
-int readNumber(unsigned int* number, byte b)
+int read_number(unsigned int* number, byte b)
 {
 	*number *= 10;
 	if (b < '0' || b > '9')
@@ -21,7 +21,7 @@ int readNumber(unsigned int* number, byte b)
 	return 0;
 }
 
-int loadImage(Image* img, const char* src)
+int load_image(Image* img, const char* src)
 {
 	img->width = 0;
 	img->height = 0;
@@ -67,27 +67,24 @@ int loadImage(Image* img, const char* src)
 					readingState++;
 				}
 			}
-			else
+			else if (b == '#')
 			{
-				if (b == '#')
+				comment = 1;
+			}
+			else if (readingState == ReadingWidth)
+			{
+				if (read_number(&img->width, b))
 				{
-					comment = 1;
+					fclose(f);
+					return 1;
 				}
-				else if (readingState == ReadingWidth)
+			}
+			else if (readingState == ReadingHeight)
+			{
+				if (read_number(&img->height, b))
 				{
-					if (readNumber(&img->width, b))
-					{
-						fclose(f);
-						return 1;
-					}
-				}
-				else if (readingState == ReadingHeight)
-				{
-					if (readNumber(&img->height, b))
-					{
-						fclose(f);
-						return 1;
-					}
+					fclose(f);
+					return 1;
 				}
 			}
 		}
